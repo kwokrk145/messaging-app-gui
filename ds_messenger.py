@@ -10,46 +10,63 @@ class DirectMessage:
 
 
 class DirectMessenger:
-  def __init__(self, dsuserver=None, username=None, password=None):
-    self.token = None
-    self.user = username
-    self.pw = password
-    self.server = dsuserver
-    self.port = 3021
+    def __init__(self, dsuserver=None, username=None, password=None):
+        self.token = None
+        self.user = username
+        self.pw = password
+        self.server = dsuserver
+        self.port = 3021
 		
-  def send(self, message:str, recipient:str) -> bool:
+    def send(self, message:str, recipient:str) -> bool:
     # must return true if message successfully sent, false if send failed.
-    #client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #client.connect((self.server, self.port))
-    
-    condition = ds_protocol.token_retrieve(self.user, self.pw, self.server, self.port)
-    if condition:
-        self.token = condition
-        to_send = f'{{"token": "{self.token}", "directmessage": {{"entry": "{message}", "recipient": "{recipient}", "timestamp": "{time.time()}"}}}}' #change time later
-        # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
-        #     client.connect(self.server, self.port)
-        #     s = client.makefile("w")
-        #     rec = client.makefile("r")
-        #     s.write(to_send + "\r\n")
-        #     s.flush()
-        #     resp = rec.readline()
-        #     info = ds_protocol.msg_extract(resp, "direct")
-        resp = send_server.response(to_send, self.server, self.port)
-        info = ds_protocol.msg_extract(resp, "direct")
-        if info is None:
-            condition = False
-        else:
-            condition = True
+        condition = ds_protocol.token_retrieve(self.user, self.pw, \
+                                               self.server, self.port)
+        if condition:
+            self.token = condition
+            to_send = f'{{"token": "{self.token}", "directmessage":\
+                        {{"entry": "{message}", "recipient": "{recipient}",\
+                        "timestamp": "{time.time()}"}}}}' #change time late
+            resp = send_server.response(to_send, self.server, self.port)
+            info = ds_protocol.msg_extract(resp, "direct")
+            if info is None:
+                condition = False
+            else:
+                condition = True
         return condition
-
-  def retrieve_new(self) -> list:
+    
+    def retrieve_new(self) -> list:
     # must return a list of DirectMessage objects containing all new messages
-    pass
+        messages = []
+        condition = ds_protocol.token_retrieve(self.user, self.pw, \
+                                               self.server, self.port)
+        if condition:
+            self.token = condition
+            to_send = f'{{"token":"{self.token}", "directmessage": "new"}}'
+            resp = send_server.response(to_send, self.server, self.port)
+            info = ds_protocol.msg_extract(resp, "other").msg
+            for m in info:
+                m = DirectMessage(m["from"], m["message"],m["timestamp"])
+                messages.append(m)
+        return messages
+
  
-  def retrieve_all(self) -> list:
+    def retrieve_all(self) -> list:
     # must return a list of DirectMessage objects containing all messages
-    pass
+        messages = []
+        condition = ds_protocol.token_retrieve(self.user, self.pw, \
+                                               self.server, self.port)
+        if condition:
+            self.token = condition
+            to_send = f'{{"token":"{self.token}", "directmessage": "all"}}'
+            resp = send_server.response(to_send, self.server, self.port)
+            info = ds_protocol.msg_extract(resp, "other").msg
+            for m in info:
+                m = DirectMessage(m["from"], m["message"], m["timestamp"])
+                messages.append(m)
+        return messages
   
 
 x = DirectMessenger("168.235.86.101", "codewars12", "hi")
-print(x.send("you", "phonebox172"))
+l = x.retrieve_all()
+for i in l:
+    print(i.message)

@@ -67,15 +67,10 @@ def msg_extract(json_msg, category):
                 message = resp["messages"]
     except json.JSONDecodeError:
             print("Json cannot be decoded.")
+            return None
     return DataT(typ, message)
 
-            
 
-            
-
-            
-
-'''
 def connect(client, server, port):
     try:
         client.connect((server, port))
@@ -86,18 +81,16 @@ def connect(client, server, port):
         print("Something went wrong. Please try again.")
     return False
 
-def token_retrieve(message, user, pw, server, port):
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    join_msg = f'{{"join": {{"username": "{user}", "password": "{pw}", "token": ""}}}}'
-    g_send = client.makefile('w')
-    recv = client.makefile('r')
-    g_send.write(join_msg + '\r\n')
-    g_send.flush()
-    resp = recv.readline()
-    data = extract_json(resp)
-    return data.token
 
-def directmessage(message, user, pw):
+def token_retrieve(user, pw, server, port):
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    token = token_retrieve(user,
-'''
+    if connect(client, server, port):
+        join_msg = f'{{"join": {{"username": "{user}", "password": "{pw}", "token": ""}}}}'
+        g_send = client.makefile('w')
+        recv = client.makefile('r')
+        g_send.write(join_msg + '\r\n')
+        g_send.flush()
+        resp = recv.readline()
+        data = extract_json(resp)
+        return data.token
+    return False

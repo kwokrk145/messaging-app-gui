@@ -92,5 +92,7 @@ def token_retrieve(user, pw, server, port):
         g_send.flush()
         resp = recv.readline()
         data = extract_json(resp)
+        client.close()
         return data.token
+    client.close()
     return False

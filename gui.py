@@ -177,7 +177,7 @@ class MainApp(tk.Frame):
         self.recipient = None
         self.profile = None # Added this
         self.path = None # ADded this
-        self.previous = None #added this
+        self.check = False
         # You must implement this! You must configure and
         # instantiate your DirectMessenger instance after this line.
         #self.direct_messenger = ... continue!
@@ -208,6 +208,7 @@ class MainApp(tk.Frame):
         self.publish(message, "myself")
         self.body.set_text_entry(message)
         self.profile.add_message(message, time.time(),user, "myself")
+        self.profile.save_profile(self.path)
 
     def add_contact(self):
         # You must implement this!
@@ -236,6 +237,7 @@ class MainApp(tk.Frame):
             self.body.correct_login(False,False)
         else:
             self.direct_messenger = ds_messenger.DirectMessenger(self.server, self.username, self.password)
+            self.check = True
         # You must implement this!
         # You must configure and instantiate your
         # DirectMessenger instance after this line.
@@ -251,9 +253,21 @@ class MainApp(tk.Frame):
 
     def check_new(self):
         # You must implement this!
-        obj = self.direct_messenger.retrieve_new()
-        sender = obj.recipient
-        msg = obj.message
+        print("hi")
+        if self.recipient and self.check:
+            print("boo")
+            obj = self.direct_messenger.retrieve_new()
+            if obj:
+                for item in obj:
+                    sender = item.recipient
+                    print(sender)
+                    msg = item.message
+                    ts = float(item.timestamp)
+                    if self.recipient == sender:
+                        self.body.insert_contact_message(msg)
+                    self.profile.add_message(msg, ts, sender, sender)
+                    self.profile.save_profile(self.path)
+
 
         
 
@@ -263,6 +277,12 @@ class MainApp(tk.Frame):
         message = self.body.get_text_entry()
         self.body.set_text_entry(message)
         self.body.delete_tree()
+        self.username = None
+        self.password = None
+        self.server = None
+        self.recipient = None
+        self.profile = None # Added this
+        self.path = None # ADded this
         
 
     def _open_profile(self):
@@ -325,7 +345,9 @@ if __name__ == "__main__":
     # subclass Tk.Frame, since our root frame is main, we initialize
     # the class with it.
     app = MainApp(main)
-
+    def update():
+        app.check_new()
+        main.after(2000, update)
     # When update is called, we finalize the states of all widgets that
     # have been configured within the root frame. Here, update ensures that
     # we get an accurate width and height reading based on the types of widgets
@@ -334,8 +356,8 @@ if __name__ == "__main__":
     # behavior of the window changes.
     main.update()
     main.minsize(main.winfo_width(), main.winfo_height())
-    id = main.after(2000, app.check_new)
-    print(id)
+    main.after(2000, update)
+    
     # And finally, start up the event loop for the program (you can find
     # more on this in lectures of week 9 and 10).
     main.mainloop()

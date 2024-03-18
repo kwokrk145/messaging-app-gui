@@ -19,7 +19,10 @@ class Body(tk.Frame):
         index = int(self.posts_tree.selection()[0])
         entry = self._contacts[index]
         if self._select_callback is not None:
+            self.delete_entries()
             self._select_callback(entry)
+            
+
 
     def insert_contact(self, contact: str):
         self._contacts.append(contact)
@@ -31,11 +34,16 @@ class Body(tk.Frame):
             entry = contact[:24] + "..."
         id = self.posts_tree.insert('', id, id, text=contact)
 
+    def delete_tree(self):
+        items = self.posts_tree.get_children()
+        for i in items:
+            self.posts_tree.delete(i)
+
     def insert_user_message(self, message:str):
-        self.entry_editor.insert(1.0, message + '\n', 'entry-right')
+        self.entry_editor.insert(tk.END, message + '\n', 'entry-right')
 
     def insert_contact_message(self, message:str):
-        self.entry_editor.insert(1.0, message + '\n', 'entry-left')
+        self.entry_editor.insert(tk.END, message + '\n', 'entry-left')
 
     def delete_entries(self):
         self.entry_editor.delete(1.0, tk.END)
@@ -180,7 +188,15 @@ class MainApp(tk.Frame):
         self._draw()
         #self.body.insert_contact("studentexw23") # adding one example student.
     
-    def switch(self):
+    def _switch(self):
+        info = self.profile.get_messages(self.recipient)
+        for m in info:
+            if m[0] == "myself":
+                self.body.insert_user_message(m[1])
+            elif m[0] == self.recipient:
+                self.body.insert_contact_message(m[1])
+
+
 
 
     def send_message(self):
@@ -207,6 +223,7 @@ class MainApp(tk.Frame):
 
     def recipient_selected(self, recipient):
         self.recipient = recipient
+        self._switch()
 
     def configure_server(self):
         ud = NewContactDialog(self.root, "Configure Account",
@@ -241,9 +258,16 @@ class MainApp(tk.Frame):
         
 
     def close(self):
-        self.destroy()
+        self.body.delete_entries()
+        friends = self.profile.get_friends()
+        message = self.body.get_text_entry()
+        self.body.set_text_entry(message)
+        self.body.delete_tree()
+        
 
     def _open_profile(self):
+        if self.profile:
+            self.close()
         filepath = tk.filedialog.askopenfilename()
         self.path = filepath
         self.profile = Profile.Profile()

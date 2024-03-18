@@ -16,11 +16,14 @@ class Body(tk.Frame):
         self._draw()
 
     def node_select(self, event=None):
-        index = int(self.posts_tree.selection()[0])
-        entry = self._contacts[index]
-        if self._select_callback is not None:
-            self.delete_entries()
-            self._select_callback(entry)
+        try:
+            index = int(self.posts_tree.selection()[0])
+            entry = self._contacts[index]
+            if self._select_callback is not None:
+                self.delete_entries()
+                self._select_callback(entry)
+        except IndexError:
+            pass
             
 
 
@@ -253,23 +256,20 @@ class MainApp(tk.Frame):
 
     def check_new(self):
         # You must implement this!
-        print("hi")
         if self.recipient and self.check:
-            print("boo")
             obj = self.direct_messenger.retrieve_new()
             if obj:
                 for item in obj:
                     sender = item.recipient
-                    print(sender)
+                    if sender not in self.profile.get_friends():
+                        self.body.insert_contact(sender)
+                        self.profile.add_friend(sender)
                     msg = item.message
                     ts = float(item.timestamp)
                     if self.recipient == sender:
                         self.body.insert_contact_message(msg)
                     self.profile.add_message(msg, ts, sender, sender)
                     self.profile.save_profile(self.path)
-
-
-        
 
     def close(self):
         self.body.delete_entries()

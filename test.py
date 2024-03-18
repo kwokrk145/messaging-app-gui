@@ -10,12 +10,15 @@ x = Profile()
 # x.username = "codewars12"
 # x.password = "hi"
 # x.bio = "boo"
-x.load_profile("/Users/kwokr/OneDrive/Random/a5/test.dsu")
-x.add_friend("tongs")
-x.add_message("hi",4, "tongs", "tongs")
-x.add_message("boo",2, "tongs", "tongs")
-x.add_message("this shoudl be first", 1, "tongs", "myself")
-x.save_profile("/Users/kwokr/OneDrive/Random/a5/test.dsu")
+#x.load_profile("/Users/kwokr/OneDrive/Random/a5/test.dsu")
+# x.add_friend("tongs")
+# x.add_message("hi",4, "tongs", "tongs")
+# x.add_message("boo",2, "tongs", "tongs")
+# x.add_message("this shoudl be first", 1, "tongs", "myself")
+x.username = "panda19l"
+x.password = "123"
+x.bio = "123"
+x.save_profile("/Users/kwokr/OneDrive/Random/a5/other.dsu")
 
 '''
 server = "168.235.86.101"

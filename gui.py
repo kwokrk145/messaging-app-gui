@@ -4,6 +4,7 @@ from typing import Text
 import Profile
 import ds_messenger
 import time
+import pathlib
 class Body(tk.Frame):
     def __init__(self, root, recipient_selected_callback=None):
         tk.Frame.__init__(self, root)
@@ -25,8 +26,6 @@ class Body(tk.Frame):
         except IndexError:
             pass
             
-
-
     def insert_contact(self, contact: str):
         self._contacts.append(contact)
         id = len(self._contacts) - 1
@@ -131,6 +130,7 @@ class NewContactDialog(tk.simpledialog.Dialog):
         self.server = server
         self.user = user
         self.pwd = pwd
+        self.bio = None
         super().__init__(root, title)
 
     def body(self, frame):
@@ -155,6 +155,13 @@ class NewContactDialog(tk.simpledialog.Dialog):
         if self.pwd:
             self.password_entry.insert(tk.END, self.pwd)
         self.password_entry.pack()
+    
+    def apply(self):
+        self.user = self.username_entry.get()
+        self.pwd = self.password_entry.get()
+        self.server = self.server_entry.get()
+
+    
 
         # You need to implement also the region for the user to enter
         # the Password. The code is similar to the Username you see above
@@ -163,12 +170,80 @@ class NewContactDialog(tk.simpledialog.Dialog):
         # * symbols.
         #self.password...
 
+# class NewFile(tk.simpledialog.Dialog):
+#     def __init__(self, root, title=None, user=None, pwd=None, bio=None):
+#         self.user = user
+#         self.pwd = pwd
+#         self.bio = bio
+#         super().__init__(root, title)
+        
+#     def body(self, frame):
+#         self.user_label = tk.Label(frame, width=30, text="Username")
+#         self.user_label.pack()
+#         self.user_entry = tk.Entry(frame, width=30)
+#         if self.user:
+#             self.user_entry.insert(tk.END, self.user)
+#         self.user_entry.pack()
 
+#         self.pwd_label = tk.Label(frame, width=30, text="Password")
+#         self.pwd_label.pack()
+#         self.pwd_entry = tk.Entry(frame, width=30)
+#         if self.pwd:
+#             self.pwd_entry.insert(tk.END, self.pwd)
+#         self.pwd_entry.pack()
+
+#         self.bio_label = tk.Label(frame,width=30, text="Bio")
+#         self.bio_label.pack()
+#         self.bio_entry = tk.Entry(frame, width=30)
+#         if self.bio:
+#             self.bio_entry.insert(tk.END, self.bio)
+#         self.bio_entry.pack()
+
+    
+#     def gather(self):
+#         self.user = self.user_entry.get()
+#         self.pwd = self.pwd_entry.get()
+#         self.bio = self.bio_entry.get() 
+#Add functonality for saving also make sure that username / bio / wtv is valid!!!
+
+
+
+class NewFile(tk.simpledialog.Dialog):
+    def __init__(self, root, title=None, user=None, pwd=None, bio=None):
+        self.root = root
+        self.user = user
+        self.pwd = pwd
+        self.bio = None
+        super().__init__(root, title)
+
+    def body(self, frame):
+        self.usr_label = tk.Label(frame, width=30, text="Username")
+        self.usr_label.pack()
+        self.usr_entry = tk.Entry(frame, width=30)
+        if self.user:
+            self.usr_entry.insert(tk.END, self.user)
+        self.usr_entry.pack()
+
+        self.password_label = tk.Label(frame, width=30, text="Password")
+        self.password_label.pack()
+        self.password_entry = tk.Entry(frame, width=30)
+        self.password_entry['show'] = '*'
+        if self.pwd:
+            self.password_entry.insert(tk.END, self.pwd)
+        self.password_entry.pack()
+
+        self.bio_label = tk.Label(frame,width=30, text="Bio")
+        self.bio_label.pack()
+        self.bio_entry = tk.Entry(frame, width=30)
+        
+        if self.bio:
+            self.bio_entry.insert(tk.END, self.bio)
+        self.bio_entry.pack()
+    
     def apply(self):
-        self.user = self.username_entry.get()
+        self.user = self.usr_entry.get()
         self.pwd = self.password_entry.get()
-        self.server = self.server_entry.get()
-
+        self.bio = self.bio_entry.get()
 
 class MainApp(tk.Frame):
     def __init__(self, root):
@@ -180,6 +255,7 @@ class MainApp(tk.Frame):
         self.recipient = None
         self.profile = None # Added this
         self.path = None # ADded this
+        self.bio = None
         self.check = False
         # You must implement this! You must configure and
         # instantiate your DirectMessenger instance after this line.
@@ -198,8 +274,6 @@ class MainApp(tk.Frame):
                 self.body.insert_user_message(m[1])
             elif m[0] == self.recipient:
                 self.body.insert_contact_message(m[1])
-
-
 
 
     def send_message(self):
@@ -236,11 +310,14 @@ class MainApp(tk.Frame):
         self.username = ud.user
         self.password = ud.pwd
         self.server = ud.server
-        if self.username != self.profile.username or self.password != self.profile.password:
-            self.body.correct_login(False,False)
-        else:
-            self.direct_messenger = ds_messenger.DirectMessenger(self.server, self.username, self.password)
-            self.check = True
+        try:
+            if self.username != self.profile.username or self.password != self.profile.password:
+                self.body.correct_login(False,False)
+            else:
+                self.direct_messenger = ds_messenger.DirectMessenger(self.server, self.username, self.password)
+                self.check = True
+        except AttributeError:
+            pass
         # You must implement this!
         # You must configure and instantiate your
         # DirectMessenger instance after this line.
@@ -283,7 +360,23 @@ class MainApp(tk.Frame):
         self.recipient = None
         self.profile = None # Added this
         self.path = None # ADded this
-        
+    
+    def new_file(self):
+        file_path = filedialog.asksaveasfilename(defaultextension=".dsu")
+
+        ud = NewFile(self.root, "New User Information",
+                              self.username, self.password, self.bio)
+        self.username = ud.user
+        self.password = ud.pwd
+        self.bio = ud.bio
+        profile = Profile.Profile()
+        profile.username = self.username
+        profile.password = self.password
+        profile.bio = self.bio
+        p = pathlib.Path(file_path)
+        with p.open("w", encoding='utf-8') as file:
+            pass
+        profile.save_profile(file_path)
 
     def _open_profile(self):
         if self.profile:
@@ -303,7 +396,7 @@ class MainApp(tk.Frame):
         menu_file = tk.Menu(menu_bar)
 
         menu_bar.add_cascade(menu=menu_file, label='File')
-        menu_file.add_command(label='New')
+        menu_file.add_command(label='New', command=self.new_file)
         menu_file.add_command(label='Open...', command=self._open_profile)
         menu_file.add_command(label='Close', command=self.close)
 

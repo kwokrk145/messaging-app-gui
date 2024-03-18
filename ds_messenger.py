@@ -67,6 +67,8 @@ class DirectMessenger:
   
 
 x = DirectMessenger("168.235.86.101", "codewars12", "hi")
-l = x.retrieve_all()
+print(x.send("i hate this assignment","phonebox711"))
+
+l = x.retrieve_new()
 for i in l:
     print(i.message)

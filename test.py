@@ -3,6 +3,15 @@
 import socket
 import time
 from ds_protocol import extract_json
+from Profile import Profile
+
+x = Profile()
+#x.save_profile("/Users/kwokr/OneDrive/Random/dsu/dogname.dsu")
+x.load_profile("/Users/kwokr/OneDrive/Random/dsu/dogname.dsu")
+x.recipients("boo")
+x.save_profile("/Users/kwokr/OneDrive/Random/dsu/dogname.dsu")
+
+'''
 server = "168.235.86.101"
 port = 3021
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -36,3 +45,4 @@ def directmessage(message, server, port, username, password):
         data = extract_json(resp)
         token = data.token
 directmessage("Fd",server,port, "hello31","123")
+'''

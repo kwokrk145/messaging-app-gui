@@ -1,8 +1,9 @@
 import tkinter as tk
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, messagebox
 from typing import Text
 import Profile
 import ds_messenger
+import time
 class Body(tk.Frame):
     def __init__(self, root, recipient_selected_callback=None):
         tk.Frame.__init__(self, root)
@@ -14,7 +15,7 @@ class Body(tk.Frame):
         # into the Body instance
         self._draw()
 
-    def node_select(self, event):
+    def node_select(self, event=None):
         index = int(self.posts_tree.selection()[0])
         entry = self._contacts[index]
         if self._select_callback is not None:
@@ -36,12 +37,21 @@ class Body(tk.Frame):
     def insert_contact_message(self, message:str):
         self.entry_editor.insert(1.0, message + '\n', 'entry-left')
 
+    def delete_entries(self):
+        self.entry_editor.delete(1.0, tk.END)
+
     def get_text_entry(self) -> str:
         return self.message_editor.get('1.0', 'end').rstrip()
 
     def set_text_entry(self, text:str):
         self.message_editor.delete(1.0, tk.END)
-        self.message_editor.insert(1.0, text)
+        #self.message_editor.insert(1.0, text)
+
+    def correct_login(self, user, pw):
+        if not user or not pw:
+            message = "Wrong username or password\nValues must match DSU Profile Loaded"
+            messagebox.showerror("Error", message)
+
 
     def _draw(self):
         posts_frame = tk.Frame(master=self, width=250)
@@ -94,6 +104,7 @@ class Footer(tk.Frame):
 
     def _draw(self):
         save_button = tk.Button(master=self, text="Send", width=20)
+        save_button.configure(command=self.send_click)
         # You must implement this.
         # Here you must configure the button to bind its click to
         # the send_click() function.
@@ -115,20 +126,23 @@ class NewContactDialog(tk.simpledialog.Dialog):
         self.server_label = tk.Label(frame, width=30, text="DS Server Address")
         self.server_label.pack()
         self.server_entry = tk.Entry(frame, width=30)
-        self.server_entry.insert(tk.END, self.server)
+        if self.server:
+            self.server_entry.insert(tk.END, self.server)
         self.server_entry.pack()
 
         self.username_label = tk.Label(frame, width=30, text="Username")
         self.username_label.pack()
         self.username_entry = tk.Entry(frame, width=30)
-        self.username_entry.insert(tk.END, self.user)
+        if self.user:
+            self.username_entry.insert(tk.END, self.user)
         self.username_entry.pack()
 
         self.password_label = tk.Label(frame,width=30, text="Password")
         self.password_label.pack()
         self.password_entry = tk.Entry(frame, width=30)
         self.password_entry['show'] = '*'
-        self.password_entry.insert(tk.END, self.pwd)
+        if self.pwd:
+            self.password_entry.insert(tk.END, self.pwd)
         self.password_entry.pack()
 
         # You need to implement also the region for the user to enter
@@ -155,6 +169,7 @@ class MainApp(tk.Frame):
         self.recipient = None
         self.profile = None # Added this
         self.path = None # ADded this
+        self.previous = None #added this
         # You must implement this! You must configure and
         # instantiate your DirectMessenger instance after this line.
         #self.direct_messenger = ... continue!
@@ -163,11 +178,20 @@ class MainApp(tk.Frame):
         # call the _draw method to pack the widgets
         # into the root frame
         self._draw()
-        self.body.insert_contact("studentexw23") # adding one example student.
+        #self.body.insert_contact("studentexw23") # adding one example student.
+    
+    def switch(self):
+
 
     def send_message(self):
         # You must implement this!
-        pass
+        message = self.body.get_text_entry()
+        self.body.node_select()
+        user = self.recipient
+        self.direct_messenger.send(message, user)
+        self.publish(message, "myself")
+        self.body.set_text_entry(message)
+        self.profile.add_message(message, time.time(),user, "myself")
 
     def add_contact(self):
         # You must implement this!
@@ -191,18 +215,30 @@ class MainApp(tk.Frame):
         self.username = ud.user
         self.password = ud.pwd
         self.server = ud.server
+        if self.username != self.profile.username or self.password != self.profile.password:
+            self.body.correct_login(False,False)
+        else:
+            self.direct_messenger = ds_messenger.DirectMessenger(self.server, self.username, self.password)
         # You must implement this!
         # You must configure and instantiate your
         # DirectMessenger instance after this line.
-        self.direct_messenger = ds_messenger.DirectMessenger(self.server, self.username, self.password)
+            
 
-    def publish(self, message:str):
+    def publish(self, message:str, kind):
         # You must implement this!
-        pass
+        if kind == "myself":
+            self.body.insert_user_message(message)
+        else:
+            self.body.insert_contact_message(message)
+        
 
     def check_new(self):
         # You must implement this!
-        pass
+        obj = self.direct_messenger.retrieve_new()
+        sender = obj.recipient
+        msg = obj.message
+
+        
 
     def close(self):
         self.destroy()

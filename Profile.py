@@ -33,6 +33,8 @@ class DsuProfileError(Exception):
     pass
 
 
+
+
 class Post(dict):
     """
 
@@ -104,7 +106,7 @@ class Profile:
         self.bio = ''             # OPTIONAL
         self._posts = []          # OPTIONAL
         self._recipients = []
-        self._messages = []
+        self._messages = {}
 
         '''
         add_post accepts a Post object as parameter
@@ -134,14 +136,24 @@ class Profile:
         '''Return all posts in a profile'''
         return self._posts
     
-    def add_message(self, message):
-        self._messages.append(message)
+    def add_message(self, message, time, receive, kind):
+        section = self._messages[receive]
+        if kind == "myself":
+            section.append(["myself",message, time])
+        else:
+            section.append([receive, message, time])
     
-    def get_messages(self):
-        return self._messages
+    def time_extract(self, obj):
+        return obj[2]
+    
+    def get_messages(self, name):
+        section = self._messages[name]
+        sorted_info = sorted(section, key=self.time_extract)
+        return sorted_info
 
     def add_friend(self, name):
         self._recipients.append(name)
+        self._messages[name] = []
 
     def get_friends(self):
         return self._recipients
@@ -178,6 +190,7 @@ class Profile:
                     self._posts.append(post)
                 for name in obj['_recipients']:
                     self._recipients.append(name)
+                self._messages = obj["_messages"]
                 f.close()
             except Exception as ex:
                 raise DsuProfileError(ex)

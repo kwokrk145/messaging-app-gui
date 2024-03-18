@@ -66,9 +66,9 @@ class DirectMessenger:
         return messages
   
 
-x = DirectMessenger("168.235.86.101", "codewars12", "hi")
-print(x.send("i hate this assignment","phonebox711"))
+#x = DirectMessenger("168.235.86.101", "codewars12", "hi")
+#print(x.send("i hate this assignment","phonebox711"))
 
-l = x.retrieve_new()
-for i in l:
-    print(i.message)
+#l = x.retrieve_new()
+#for i in l:
+#    print(i.message)

@@ -5,6 +5,7 @@ import Profile
 import ds_messenger
 import time
 import pathlib
+from ds_protocol import connect
 class Body(tk.Frame):
     def __init__(self, root, recipient_selected_callback=None):
         tk.Frame.__init__(self, root)
@@ -61,6 +62,14 @@ class Body(tk.Frame):
         if not user or not pw:
             message = "Wrong username or password\nValues must match DSU Profile Loaded"
             messagebox.showerror("Error", message)
+    
+    def not_connected(self):
+        message = "You must open a profile and connect to the server before sending a message!"
+        messagebox.showerror("Error", message)
+
+    def connection_error(self):
+        message = "Something went wrong when connecting to DSU Server\nPlease try again."
+        messagebox.showerror("Error", message)
 
 
     def _draw(self):
@@ -72,7 +81,7 @@ class Body(tk.Frame):
         self.posts_tree.pack(fill=tk.BOTH, side=tk.TOP,
                              expand=True, padx=5, pady=5)
 
-        entry_frame = tk.Frame(master=self, bg="")
+        entry_frame = tk.Frame(master=self,bg = "blue")
         entry_frame.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
 
         editor_frame = tk.Frame(master=entry_frame, bg="red")
@@ -170,43 +179,6 @@ class NewContactDialog(tk.simpledialog.Dialog):
         # * symbols.
         #self.password...
 
-# class NewFile(tk.simpledialog.Dialog):
-#     def __init__(self, root, title=None, user=None, pwd=None, bio=None):
-#         self.user = user
-#         self.pwd = pwd
-#         self.bio = bio
-#         super().__init__(root, title)
-        
-#     def body(self, frame):
-#         self.user_label = tk.Label(frame, width=30, text="Username")
-#         self.user_label.pack()
-#         self.user_entry = tk.Entry(frame, width=30)
-#         if self.user:
-#             self.user_entry.insert(tk.END, self.user)
-#         self.user_entry.pack()
-
-#         self.pwd_label = tk.Label(frame, width=30, text="Password")
-#         self.pwd_label.pack()
-#         self.pwd_entry = tk.Entry(frame, width=30)
-#         if self.pwd:
-#             self.pwd_entry.insert(tk.END, self.pwd)
-#         self.pwd_entry.pack()
-
-#         self.bio_label = tk.Label(frame,width=30, text="Bio")
-#         self.bio_label.pack()
-#         self.bio_entry = tk.Entry(frame, width=30)
-#         if self.bio:
-#             self.bio_entry.insert(tk.END, self.bio)
-#         self.bio_entry.pack()
-
-    
-#     def gather(self):
-#         self.user = self.user_entry.get()
-#         self.pwd = self.pwd_entry.get()
-#         self.bio = self.bio_entry.get() 
-#Add functonality for saving also make sure that username / bio / wtv is valid!!!
-
-
 
 class NewFile(tk.simpledialog.Dialog):
     def __init__(self, root, title=None, user=None, pwd=None, bio=None):
@@ -281,11 +253,14 @@ class MainApp(tk.Frame):
         message = self.body.get_text_entry()
         self.body.node_select()
         user = self.recipient
-        self.direct_messenger.send(message, user)
-        self.publish(message, "myself")
-        self.body.set_text_entry(message)
-        self.profile.add_message(message, time.time(),user, "myself")
-        self.profile.save_profile(self.path)
+        if self.recipient and self.username:
+            self.direct_messenger.send(message, user)
+            self.publish(message, "myself")
+            self.body.set_text_entry(message)
+            self.profile.add_message(message, time.time(),user, "myself")
+            self.profile.save_profile(self.path)
+        else:
+            self.body.not_connected()
 
     def add_contact(self):
         # You must implement this!
@@ -314,8 +289,12 @@ class MainApp(tk.Frame):
             if self.username != self.profile.username or self.password != self.profile.password:
                 self.body.correct_login(False,False)
             else:
-                self.direct_messenger = ds_messenger.DirectMessenger(self.server, self.username, self.password)
-                self.check = True
+                if connect("", self.server, 3021, "yes"):
+                    self.direct_messenger = ds_messenger.DirectMessenger(self.server, self.username, self.password)
+                    self.check = True
+                else:
+                    self.body.connection_error()
+                    self.server = None
         except AttributeError:
             pass
         # You must implement this!

@@ -71,7 +71,9 @@ def msg_extract(json_msg, category):
     return DataT(typ, message)
 
 
-def connect(client, server, port):
+def connect(client, server, port, needed=None):
+    if needed:
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         client.connect((server, port))
         return True

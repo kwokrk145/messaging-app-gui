@@ -5,7 +5,7 @@ import Profile
 import ds_messenger
 import time
 import pathlib
-from ds_protocol import connect
+from server_commands import connect_server
 class Body(tk.Frame):
     def __init__(self, root, recipient_selected_callback=None):
         tk.Frame.__init__(self, root)
@@ -34,7 +34,7 @@ class Body(tk.Frame):
 
     def _insert_contact_tree(self, id, contact: str):
         if len(contact) > 25:
-            entry = contact[:24] + "..."
+            contact = contact[:24] + "..."
         id = self.posts_tree.insert('', id, id, text=contact)
 
     def delete_tree(self):
@@ -73,7 +73,7 @@ class Body(tk.Frame):
 
 
     def _draw(self):
-        posts_frame = tk.Frame(master=self, width=250)
+        posts_frame = tk.Frame(master=self, width=250, bg = "red")
         posts_frame.pack(fill=tk.BOTH, side=tk.LEFT)
 
         self.posts_tree = ttk.Treeview(posts_frame)
@@ -81,23 +81,23 @@ class Body(tk.Frame):
         self.posts_tree.pack(fill=tk.BOTH, side=tk.TOP,
                              expand=True, padx=5, pady=5)
 
-        entry_frame = tk.Frame(master=self,bg = "blue")
+        entry_frame = tk.Frame(master=self,bg = "red")
         entry_frame.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
 
         editor_frame = tk.Frame(master=entry_frame, bg="red")
         editor_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
 
-        scroll_frame = tk.Frame(master=entry_frame, bg="blue", width=10)
+        scroll_frame = tk.Frame(master=entry_frame, bg="red", width=10)
         scroll_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=False)
 
-        message_frame = tk.Frame(master=self, bg="yellow")
+        message_frame = tk.Frame(master=self, bg="red")
         message_frame.pack(fill=tk.BOTH, side=tk.TOP, expand=False)
 
         self.message_editor = tk.Text(message_frame, width=0, height=5)
         self.message_editor.pack(fill=tk.BOTH, side=tk.LEFT,
                                  expand=True, padx=0, pady=0)
 
-        self.entry_editor = tk.Text(editor_frame, width=0, height=5)
+        self.entry_editor = tk.Text(editor_frame, width=0, height=5, bg="red")
         self.entry_editor.tag_configure('entry-right', justify='right')
         self.entry_editor.tag_configure('entry-left', justify='left')
         self.entry_editor.pack(fill=tk.BOTH, side=tk.LEFT,
@@ -172,14 +172,6 @@ class NewContactDialog(tk.simpledialog.Dialog):
 
     
 
-        # You need to implement also the region for the user to enter
-        # the Password. The code is similar to the Username you see above
-        # but you will want to add self.password_entry['show'] = '*'
-        # such that when the user types, the only thing that appears are
-        # * symbols.
-        #self.password...
-
-
 class NewFile(tk.simpledialog.Dialog):
     def __init__(self, root, title=None, user=None, pwd=None, bio=None):
         self.root = root
@@ -247,6 +239,14 @@ class MainApp(tk.Frame):
             elif m[0] == self.recipient:
                 self.body.insert_contact_message(m[1])
 
+    def reset(self):
+        self.username = None
+        self.password = None
+        self.server = None
+        self.recipient = None
+        self.profile = None # Added this
+        self.path = None
+
 
     def send_message(self):
         # You must implement this!
@@ -285,11 +285,12 @@ class MainApp(tk.Frame):
         self.username = ud.user
         self.password = ud.pwd
         self.server = ud.server
+        self.profile.dsuserver = self.server
         try:
             if self.username != self.profile.username or self.password != self.profile.password:
                 self.body.correct_login(False,False)
             else:
-                if connect("", self.server, 3021, "yes"):
+                if connect_server("", self.server, 3021, "yes"):
                     self.direct_messenger = ds_messenger.DirectMessenger(self.server, self.username, self.password)
                     self.check = True
                 else:
@@ -356,6 +357,11 @@ class MainApp(tk.Frame):
             with p.open("w", encoding='utf-8') as file:
                 pass
             profile.save_profile(file_path)
+            self.body.delete_entries()
+            self.body.delete_tree()
+            self.body.set_text_entry("temp")
+            self.profile = profile
+            self.path = p
 
     def _open_profile(self):
         if self.profile:
@@ -367,6 +373,36 @@ class MainApp(tk.Frame):
         friends = self.profile.get_friends()
         for i in friends:
             self.body.insert_contact(i)
+        self.body.delete_entries()
+        
+    def instructions(self):
+        self.body.delete_entries()
+        message = "              Welcome to the DSU Messenging App!"
+        message1 = "-" * 60
+        message2 = "1. Please open a DSU profile to load contacts and old\nmessages."
+        message2 += " If not, please create a new profile\n"
+        message4 = "2. Then, please connect to the DSU server. If you forgot \nyour username or password,"
+        message4 += " please hit view information under the Messenger Info."
+        self.body.insert_contact_message(message)
+        self.body.insert_contact_message(message1)
+        self.body.insert_contact_message(message2)
+        #self.body.insert_contact_message(message3)
+        self.body.insert_contact_message(message4)
+        #self.body.insert_contact_message(message5)
+
+
+    def view_information(self):
+        self.body.delete_entries()
+        if self.profile:
+            message1 = f"DSU Address: {self.profile.dsuserver}"
+            message2 = f"Username: {self.profile.username}"
+            message3 = f"Password: {self.profile.password}"
+            self.body.insert_contact_message(message1)
+            self.body.insert_contact_message(message2)
+            self.body.insert_contact_message(message3)
+        else:
+            error = "ERROR: You haven't opened a profile\nand or connected to the server yet!"
+            self.body.insert_contact_message(error)
     
     def _draw(self):
         # Build a menu and add it to the root frame.
@@ -380,11 +416,16 @@ class MainApp(tk.Frame):
         menu_file.add_command(label='Close', command=self.close)
 
         settings_file = tk.Menu(menu_bar)
+        instructions = tk.Menu(menu_bar)
         menu_bar.add_cascade(menu=settings_file, label='Settings')
+        menu_bar.add_cascade(menu=instructions, label="Messenger Info")
         settings_file.add_command(label='Add Contact',
                                   command=self.add_contact)
         settings_file.add_command(label='Configure DS Server',
                                   command=self.configure_server)
+        instructions.add_command(label="How to use", command=self.instructions)
+        instructions.add_command(label='View Information', command=self.view_information)
+        
 
         # The Body and Footer classes must be initialized and
         # packed into the root window.
@@ -393,6 +434,8 @@ class MainApp(tk.Frame):
         self.body.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
         self.footer = Footer(self.root, send_callback=self.send_message)
         self.footer.pack(fill=tk.BOTH, side=tk.BOTTOM)
+        if not self.path:
+            self.instructions()
     
 
 

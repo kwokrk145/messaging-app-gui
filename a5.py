@@ -6,15 +6,14 @@ import ds_messenger
 import time
 import pathlib
 from server_commands import connect_server
+
+
 class Body(tk.Frame):
     def __init__(self, root, recipient_selected_callback=None):
         tk.Frame.__init__(self, root)
         self.root = root
         self._contacts = [str]
         self._select_callback = recipient_selected_callback
-        # After all initialization is complete,
-        # call the _draw method to pack the widgets
-        # into the Body instance
         self._draw()
 
     def node_select(self, event=None):
@@ -26,7 +25,7 @@ class Body(tk.Frame):
                 self._select_callback(entry)
         except IndexError:
             pass
-            
+
     def insert_contact(self, contact: str):
         self._contacts.append(contact)
         id = len(self._contacts) - 1
@@ -42,10 +41,10 @@ class Body(tk.Frame):
         for i in items:
             self.posts_tree.delete(i)
 
-    def insert_user_message(self, message:str):
+    def insert_user_message(self, message: str):
         self.entry_editor.insert(tk.END, message + '\n', 'entry-right')
 
-    def insert_contact_message(self, message:str):
+    def insert_contact_message(self, message: str):
         self.entry_editor.insert(tk.END, message + '\n', 'entry-left')
 
     def delete_entries(self):
@@ -54,21 +53,23 @@ class Body(tk.Frame):
     def get_text_entry(self) -> str:
         return self.message_editor.get('1.0', 'end').rstrip()
 
-    def set_text_entry(self, text:str):
+    def set_text_entry(self):
         self.message_editor.delete(1.0, tk.END)
-        #self.message_editor.insert(1.0, text)
 
     def correct_login(self, user, pw):
         if not user or not pw:
-            message = "Wrong username or password\nValues must match DSU Profile Loaded"
+            message = "Wrong username or password\n"
+            message += "Values must match DSU Profile Loaded"
             messagebox.showerror("Error", message)
-    
+
     def not_connected(self):
-        message = "You must open a profile and connect to the server before sending a message!"
+        message = "You must open a profile and connect "
+        message += "to the server before sending a message!"
         messagebox.showerror("Error", message)
 
     def connection_error(self):
-        message = "Something went wrong when connecting to DSU Server\nPlease try again."
+        message = "Something went wrong when connecting "
+        message += "to DSU Server\nPlease try again."
         messagebox.showerror("Error", message)
 
     def unopened(self):
@@ -76,7 +77,7 @@ class Body(tk.Frame):
         messagebox.showerror("Error", message)
 
     def _draw(self):
-        posts_frame = tk.Frame(master=self, width=250, bg = "#73d2de")
+        posts_frame = tk.Frame(master=self, width=250, bg="#73d2de")
         posts_frame.pack(fill=tk.BOTH, side=tk.LEFT)
 
         self.posts_tree = ttk.Treeview(posts_frame)
@@ -84,7 +85,7 @@ class Body(tk.Frame):
         self.posts_tree.pack(fill=tk.BOTH, side=tk.TOP,
                              expand=True, padx=5, pady=5)
 
-        entry_frame = tk.Frame(master=self,bg="#C0DFFF")
+        entry_frame = tk.Frame(master=self, bg="#C0DFFF")
         entry_frame.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
 
         editor_frame = tk.Frame(master=entry_frame, bg="#C0DFFF")
@@ -96,11 +97,13 @@ class Body(tk.Frame):
         message_frame = tk.Frame(master=self, bg="#C0DFFF")
         message_frame.pack(fill=tk.BOTH, side=tk.TOP, expand=False)
 
-        self.message_editor = tk.Text(message_frame, width=0, height=5, bg="#C0DFFF")
+        self.message_editor = tk.Text(message_frame, width=0,
+                                      height=5, bg="#C0DFFF")
         self.message_editor.pack(fill=tk.BOTH, side=tk.LEFT,
                                  expand=True, padx=0, pady=0)
 
-        self.entry_editor = tk.Text(editor_frame, width=0, height=5, bg="#C1D1C9")
+        self.entry_editor = tk.Text(editor_frame, width=0,
+                                    height=5, bg="#C1D1C9")
         self.entry_editor.tag_configure('entry-right', justify='right')
         self.entry_editor.tag_configure('entry-left', justify='left')
         self.entry_editor.pack(fill=tk.BOTH, side=tk.LEFT,
@@ -127,9 +130,6 @@ class Footer(tk.Frame):
     def _draw(self):
         save_button = tk.Button(master=self, text="Send", width=20)
         save_button.configure(command=self.send_click)
-        # You must implement this.
-        # Here you must configure the button to bind its click to
-        # the send_click() function.
         save_button.pack(fill=tk.BOTH, side=tk.RIGHT, padx=5, pady=5)
 
         self.footer_label = tk.Label(master=self, text="Ready.")
@@ -160,20 +160,19 @@ class NewContactDialog(tk.simpledialog.Dialog):
             self.username_entry.insert(tk.END, self.user)
         self.username_entry.pack()
 
-        self.password_label = tk.Label(frame,width=30, text="Password")
+        self.password_label = tk.Label(frame, width=30, text="Password")
         self.password_label.pack()
         self.password_entry = tk.Entry(frame, width=30)
         self.password_entry['show'] = '*'
         if self.pwd:
             self.password_entry.insert(tk.END, self.pwd)
         self.password_entry.pack()
-    
+
     def apply(self):
         self.user = self.username_entry.get()
         self.pwd = self.password_entry.get()
         self.server = self.server_entry.get()
 
-    
 
 class NewFile(tk.simpledialog.Dialog):
     def __init__(self, root, title=None, user=None, pwd=None, bio=None):
@@ -199,18 +198,19 @@ class NewFile(tk.simpledialog.Dialog):
             self.password_entry.insert(tk.END, self.pwd)
         self.password_entry.pack()
 
-        self.bio_label = tk.Label(frame,width=30, text="Bio")
+        self.bio_label = tk.Label(frame, width=30, text="Bio")
         self.bio_label.pack()
         self.bio_entry = tk.Entry(frame, width=30)
-        
+
         if self.bio:
             self.bio_entry.insert(tk.END, self.bio)
         self.bio_entry.pack()
-    
+
     def apply(self):
         self.user = self.usr_entry.get()
         self.pwd = self.password_entry.get()
         self.bio = self.bio_entry.get()
+
 
 class MainApp(tk.Frame):
     def __init__(self, root):
@@ -220,21 +220,14 @@ class MainApp(tk.Frame):
         self.password = None
         self.server = None
         self.recipient = None
-        self.profile = None # Added this
-        self.path = None # ADded this
+        self.profile = None
+        self.path = None
         self.bio = None
         self.check = False
-        # You must implement this! You must configure and
-        # instantiate your DirectMessenger instance after this line.
-        #self.direct_messenger = ... continue!
         self.direct_messenger = None
         self.start = True
-        # After all initialization is complete,
-        # call the _draw method to pack the widgets
-        # into the root frame
         self._draw()
-        #self.body.insert_contact("studentexw23") # adding one example student.
-    
+
     def _switch(self):
         topic = f"Chat history with {self.recipient}"
         line = "-" * 70
@@ -244,7 +237,7 @@ class MainApp(tk.Frame):
         for m in info:
             message = m[1]
             if len(message) >= 35:
-                message = message[0:35] + "\n" + message[35:] 
+                message = message[0:35] + "\n" + message[35:]
             if m[0] == "myself":
                 if "You" not in message:
                     message = "You: " + message
@@ -258,12 +251,10 @@ class MainApp(tk.Frame):
         self.password = None
         self.server = None
         self.recipient = None
-        self.profile = None # Added this
+        self.profile = None
         self.path = None
 
-
     def send_message(self):
-        # You must implement this!
         if self.profile and not self.recipient:
             message = "Please select a person to chat with."
             messagebox.showerror("Notice", message)
@@ -275,26 +266,22 @@ class MainApp(tk.Frame):
                 self.direct_messenger.send(message, user)
                 message = "You: " + message
                 self.publish(message, "myself")
-                self.body.set_text_entry(message)
-                self.profile.add_message(message, time.time(),user, "myself")
+                self.body.set_text_entry()
+                self.profile.add_message(message, time.time(), user, "myself")
                 self.profile.save_profile(self.path)
             else:
                 self.body.not_connected()
 
     def add_contact(self):
-        # You must implement this!
-        # Hint: check how to use tk.simpledialog.askstring to retrieve
-        # the name of the new contact, and then use one of the body
-        # methods to add the contact to your contact list
         if self.profile:
-            name = tk.simpledialog.askstring("Add Contact", "Enter name of new contact")
+            m = "Enter name of new contact"
+            name = tk.simpledialog.askstring("Add Contact", m)
             if name:
                 self.body.insert_contact(name)
                 self.profile.add_friend(name)
                 self.profile.save_profile(self.path)
         else:
             self.body.unopened()
-
 
     def recipient_selected(self, recipient):
         self.recipient = recipient
@@ -303,18 +290,21 @@ class MainApp(tk.Frame):
     def configure_server(self):
         if self.profile:
             ud = NewContactDialog(self.root, "Configure Account",
-                                self.username, self.password, self.server)
-            
+                                  self.username, self.password, self.server)
             self.username = ud.user
             self.password = ud.pwd
             self.server = ud.server
             self.profile.dsuserver = self.server
             try:
-                if self.username != self.profile.username or self.password != self.profile.password:
-                    self.body.correct_login(False,False)
+                if self.username != self.profile.username or\
+                                    self.password != self.profile.password:
+                    self.body.correct_login(False, False)
                 else:
                     if connect_server("", self.server, 3021, "yes"):
-                        self.direct_messenger = ds_messenger.DirectMessenger(self.server, self.username, self.password)
+                        t = ds_messenger.DirectMessenger(self.server,
+                                                         self.username,
+                                                         self.password)
+                        self.direct_messenger = t
                         self.check = True
                     else:
                         self.body.connection_error()
@@ -327,21 +317,15 @@ class MainApp(tk.Frame):
                 messagebox.showerror("Notice", message)
             else:
                 self.body.unopened()
-        # You must implement this!
-        # You must configure and instantiate your
-        # DirectMessenger instance after this line.
-            
 
-    def publish(self, message:str, kind):
+    def publish(self, message: str, kind):
         # You must implement this!
         if kind == "myself":
             self.body.insert_user_message(message)
         else:
             self.body.insert_contact_message(message)
-        
 
     def check_new(self):
-        # You must implement this!
         if self.recipient and self.check:
             obj = self.direct_messenger.retrieve_new()
             if obj:
@@ -363,24 +347,23 @@ class MainApp(tk.Frame):
             self.body.delete_entries()
             friends = self.profile.get_friends()
             message = self.body.get_text_entry()
-            self.body.set_text_entry(message)
+            self.body.set_text_entry()
             self.body.delete_tree()
             self.username = None
             self.password = None
             self.server = None
             self.recipient = None
-            self.profile = None # Added this
-            self.path = None # ADded this
+            self.profile = None
+            self.path = None
         else:
             message = "You haven't opened anything..."
             messagebox.showerror("Notice", message)
 
-    
     def new_file(self):
         file_path = filedialog.asksaveasfilename(defaultextension=".dsu")
         if file_path:
             ud = NewFile(self.root, "New User Information",
-                                self.username, self.password, self.bio)
+                         self.username, self.password, self.bio)
             self.username = ud.user
             self.password = ud.pwd
             self.bio = ud.bio
@@ -394,10 +377,9 @@ class MainApp(tk.Frame):
             profile.save_profile(file_path)
             self.body.delete_entries()
             self.body.delete_tree()
-            self.body.set_text_entry("temp")
+            self.body.set_text_entry()
             self.profile = profile
             self.path = p
-            
 
     def _open_profile(self):
         if self.profile:
@@ -410,23 +392,24 @@ class MainApp(tk.Frame):
         for i in friends:
             self.body.insert_contact(i)
         self.body.delete_entries()
-        
+
     def instructions(self):
         self.body.delete_entries()
         message = " " * 17 + "Welcome to the DSU Messenging App!"
         message1 = "-" * 70
-        message2 = "1. Please open a DSU profile to load contacts and old messages."
+        message2 = "1. Please open a DSU profile to "
+        message2 += "load contacts and old messages."
         message2 += " If\nnot, please create a new profile.\n"
-        message4 = "2. Then, please connect to the DSU server. If you forgot your username or password,"
+        message4 = "2. Then, please connect to the DSU server. "
+        message4 += "If you forgot your username or password,"
         message4 += " please hit view information under the Messenger Info."
-        message5 = "\n3. To add contact, please hit add contact under settings."
+        message5 = "\n3. To add contact, "
+        message5 += "please hit add contact under settings."
         self.body.insert_contact_message(message)
         self.body.insert_contact_message(message1)
         self.body.insert_contact_message(message2)
-        #self.body.insert_contact_message(message3)
         self.body.insert_contact_message(message4)
         self.body.insert_contact_message(message5)
-
 
     def view_information(self):
         self.body.delete_entries()
@@ -443,11 +426,11 @@ class MainApp(tk.Frame):
             self.body.insert_contact_message(message2)
             self.body.insert_contact_message(message3)
         else:
-            error = "ERROR: You haven't opened a profile and or connected to the server yet"
+            error = "ERROR: You haven't opened a profile "
+            error += "and or connected to the server yet"
             self.body.insert_contact_message(error)
-    
+
     def _draw(self):
-        # Build a menu and add it to the root frame.
         menu_bar = tk.Menu(self.root)
         self.root['menu'] = menu_bar
         menu_file = tk.Menu(menu_bar)
@@ -466,11 +449,8 @@ class MainApp(tk.Frame):
         settings_file.add_command(label='Configure DS Server',
                                   command=self.configure_server)
         instructions.add_command(label="How to use", command=self.instructions)
-        instructions.add_command(label='View Information', command=self.view_information)
-        
-
-        # The Body and Footer classes must be initialized and
-        # packed into the root window.
+        instructions.add_command(label='View Information',
+                                 command=self.view_information)
         self.body = Body(self.root,
                          recipient_selected_callback=self.recipient_selected)
         self.body.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
@@ -478,7 +458,6 @@ class MainApp(tk.Frame):
         self.footer.pack(fill=tk.BOTH, side=tk.BOTTOM)
         if not self.path:
             self.instructions()
-    
 
 
 if __name__ == "__main__":
@@ -502,6 +481,7 @@ if __name__ == "__main__":
     # subclass Tk.Frame, since our root frame is main, we initialize
     # the class with it.
     app = MainApp(main)
+
     def update():
         app.check_new()
         main.after(2000, update)
@@ -514,7 +494,6 @@ if __name__ == "__main__":
     main.update()
     main.minsize(main.winfo_width(), main.winfo_height())
     main.after(2000, update)
-    
     # And finally, start up the event loop for the program (you can find
     # more on this in lectures of week 9 and 10).
     main.mainloop()

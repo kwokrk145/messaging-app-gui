@@ -342,20 +342,20 @@ class MainApp(tk.Frame):
     
     def new_file(self):
         file_path = filedialog.asksaveasfilename(defaultextension=".dsu")
-
-        ud = NewFile(self.root, "New User Information",
-                              self.username, self.password, self.bio)
-        self.username = ud.user
-        self.password = ud.pwd
-        self.bio = ud.bio
-        profile = Profile.Profile()
-        profile.username = self.username
-        profile.password = self.password
-        profile.bio = self.bio
-        p = pathlib.Path(file_path)
-        with p.open("w", encoding='utf-8') as file:
-            pass
-        profile.save_profile(file_path)
+        if file_path:
+            ud = NewFile(self.root, "New User Information",
+                                self.username, self.password, self.bio)
+            self.username = ud.user
+            self.password = ud.pwd
+            self.bio = ud.bio
+            profile = Profile.Profile()
+            profile.username = self.username
+            profile.password = self.password
+            profile.bio = self.bio
+            p = pathlib.Path(file_path)
+            with p.open("w", encoding='utf-8') as file:
+                pass
+            profile.save_profile(file_path)
 
     def _open_profile(self):
         if self.profile:

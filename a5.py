@@ -9,7 +9,6 @@ import pathlib
 from server_commands import connect_server
 
 
-
 class Body(tk.Frame):
     def __init__(self, root, recipient_selected_callback=None):
         tk.Frame.__init__(self, root)
@@ -51,8 +50,8 @@ class Body(tk.Frame):
         '''Insert user message to the right'''
         font = ("Times New Roman", 11)
         self.entry_editor.tag_configure("custom_font", font=font)
-        self.entry_editor.insert(tk.END, message + '\n', ('entry-right', 'custom_font'))
-
+        self.entry_editor.insert(tk.END, message + '\n',
+                                 ('entry-right', 'custom_font'))
 
     def insert_contact_message(self, message: str, notice=None):
         '''Insert user message to the left'''
@@ -60,7 +59,8 @@ class Body(tk.Frame):
         if notice:
             font = ("Times New Roman", 11, "bold")
         self.entry_editor.tag_configure("custom_font", font=font)
-        self.entry_editor.insert(tk.END, message + '\n', ('entry-left','custom_font'))
+        self.entry_editor.insert(tk.END, message + '\n',
+                                 ('entry-left', 'custom_font'))
 
     def delete_entries(self):
         '''Delete entries'''
@@ -142,7 +142,7 @@ class Body(tk.Frame):
 class Footer(tk.Frame):
     '''Class for footer visual and functions'''
 
-    def __init__(self, root, send_callback=None,send_callback2=None):
+    def __init__(self, root, send_callback=None, send_callback2=None):
         '''Define important attributes'''
         tk.Frame.__init__(self, root)
         self.root = root
@@ -154,7 +154,9 @@ class Footer(tk.Frame):
         '''Send button command'''
         if self._send_callback is not None:
             self._send_callback()
+
     def add(self):
+        '''add contact button'''
         if self._send_callback2 is not None:
             self._send_callback2()
 
@@ -167,7 +169,6 @@ class Footer(tk.Frame):
         add_button = tk.Button(master=self, text="Add Contact", width=20)
         add_button.configure(command=self.add)
         add_button.pack(fill=tk.BOTH, side=tk.LEFT, padx=10, pady=10)
-
 
 
 class NewContactDialog(tk.simpledialog.Dialog):
@@ -352,11 +353,11 @@ class MainApp(tk.Frame):
             self.profile.dsuserver = self.server
             try:
                 if self.username is None and self.password is None \
-                    and self.server is None:
+                                and self.server is None:
                     pass
-                elif self.username != self.profile.username or\
-                                    self.password != self.profile.password and\
-                                    self.server is not None:
+                elif self.username != self.profile.username or \
+                    self.password != self.profile.password and \
+                        self.server is not None:
                     self.body.correct_login(False, False)
                 else:
                     if self.server is None:
@@ -366,7 +367,7 @@ class MainApp(tk.Frame):
                                                          self.username,
                                                          self.password)
                         mage = "Connected to server!"
-                        messagebox.showinfo("Notice",mage)
+                        messagebox.showinfo("Notice", mage)
                         self.direct_messenger = t
                         self.check = True
                         self.profile.save_profile(self.path)
@@ -461,7 +462,6 @@ class MainApp(tk.Frame):
             messagebox.showerror("Missing Information", error)
             self.close()
 
-
     def _open_profile(self):
         '''Open profiles'''
         try:
@@ -532,26 +532,30 @@ class MainApp(tk.Frame):
 
         menu_bar.add_cascade(menu=menu_file, label='File')
         menu_file.add_command(label='New', font=f, command=self.new_file)
-        menu_file.add_command(label='Open...', font=f, command=self._open_profile)
+        menu_file.add_command(label='Open...', font=f,
+                              command=self._open_profile)
         menu_file.add_command(label='Close', font=f, command=self.close)
-        
+
         settings_file = tk.Menu(menu_bar)
         instructions = tk.Menu(menu_bar)
         menu_bar.add_cascade(menu=settings_file, label='Settings')
         menu_bar.add_cascade(menu=instructions, label="Messenger Info")
         settings_file.add_command(label='Add Contact', font=f,
                                   command=self.add_contact)
-        settings_file.add_command(label='Configure DS Server',font=f,
+        settings_file.add_command(label='Configure DS Server', font=f,
                                   command=self.configure_server)
-        instructions.add_command(label="How to use", font=f, command=self.instructions)
+        instructions.add_command(label="How to use", font=f,
+                                 command=self.instructions)
         instructions.add_command(label='View Information', font=f,
                                  command=self.view_information)
         self.body = Body(self.root,
                          recipient_selected_callback=self.recipient_selected)
         self.body.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
-        self.footer = Footer(self.root, send_callback=self.send_message, send_callback2=self.add_contact)
+        self.footer = Footer(self.root, send_callback=self.send_message,
+                             send_callback2=self.add_contact)
         self.footer.pack(fill=tk.BOTH, side=tk.BOTTOM)
-        la = tk.Label(self.root, text="Contacts", bg="white", font=("Times New Roman", 11, "bold"))
+        la = tk.Label(self.root, text="Contacts", bg="white",
+                      font=("Times New Roman", 11, "bold"))
         la.place(x=78, y=6)
         add_button = tk.Button(master=self, text="Add Contact", width=20)
         add_button.configure(command=self.add_contact)

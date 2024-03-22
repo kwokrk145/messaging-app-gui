@@ -25,14 +25,10 @@ from pathlib import Path
 
 class DsuFileError(Exception):
     '''DSUFileError exception'''
-    pass
 
 
 class DsuProfileError(Exception):
     '''DsuProfile Error exception'''
-    pass
-
-
 
 
 class Post(dict):
@@ -135,27 +131,32 @@ class Profile:
     def get_posts(self) -> list[Post]:
         '''Return all posts in a profile'''
         return self._posts
-    
+
     def add_message(self, message, time, receive, kind):
+        '''Add message'''
         section = self._messages[receive]
         if kind == "myself":
-            section.append(["myself",message, time])
+            section.append(["myself", message, time])
         else:
             section.append([receive, message, time])
-    
+
     def time_extract(self, obj):
+        '''Extract time'''
         return obj[2]
-    
+
     def get_messages(self, name):
+        '''Get profile messages'''
         section = self._messages[name]
         sorted_info = sorted(section, key=self.time_extract)
         return sorted_info
 
     def add_friend(self, name):
+        '''Add friend into profile info'''
         self._recipients.append(name)
         self._messages[name] = []
 
     def get_friends(self):
+        '''Return list of friends'''
         return self._recipients
 
     def save_profile(self, path: str) -> None:

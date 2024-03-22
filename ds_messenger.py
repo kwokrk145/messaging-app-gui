@@ -1,7 +1,7 @@
+'''Module for sending information to server'''
+import time
 import server_commands
 import ds_protocol
-import time
-import send_server
 
 
 class DirectMessage:
@@ -29,9 +29,9 @@ class DirectMessenger:
             if condition:
                 self.token = condition
                 to_send = f'{{"token": "{self.token}", "directmessage":\
-                            {{"entry": "{message}", "recipient": "{recipient}",\
-                            "timestamp": "{time.time()}"}}}}'
-                resp = send_server.response(to_send, self.server, self.port)
+                            {{"entry": "{message}", "recipient":\
+                              "{recipient}", "timestamp": "{time.time()}"}}}}'
+                resp = server_commands.response(to_send, self.server, self.port)
                 info = ds_protocol.directmessage(resp, "direct")
                 if info is None:
                     condition = False
@@ -45,12 +45,12 @@ class DirectMessenger:
         '''Retrieve new information'''
         try:
             messages = []
-            condition = server_commands.token_retrieve(self.user, self.pw, \
+            condition = server_commands.token_retrieve(self.user, self.pw,
                                                        self.server, self.port)
             if condition:
                 self.token = condition
                 to_send = f'{{"token":"{self.token}", "directmessage": "new"}}'
-                resp = send_server.response(to_send, self.server, self.port)
+                resp = server_commands.response(to_send, self.server, self.port)
                 info = ds_protocol.directmessage(resp, "other").msg
                 for m in info:
                     m = DirectMessage(m["from"], m["message"], m["timestamp"])
@@ -65,12 +65,12 @@ class DirectMessenger:
         '''Retrieve all information'''
         try:
             messages = []
-            condition = server_commands.token_retrieve(self.user, self.pw, \
+            condition = server_commands.token_retrieve(self.user, self.pw,
                                                        self.server, self.port)
             if condition:
                 self.token = condition
                 to_send = f'{{"token":"{self.token}", "directmessage": "all"}}'
-                resp = send_server.response(to_send, self.server, self.port)
+                resp = server_commands.response(to_send, self.server, self.port)
                 info = ds_protocol.directmessage(resp, "other").msg
                 for m in info:
                     m = DirectMessage(m["from"], m["message"], m["timestamp"])

@@ -24,6 +24,7 @@ port = 3021
 DataTuple = namedtuple('DataTuple', ['typ', 'msg', 'token'])
 DataT = namedtuple("DataT", ["typ", "msg"])
 
+
 def extract_json(json_msg: str) -> DataTuple:
     '''
     Call the json.loads function on a json string
@@ -54,6 +55,7 @@ def dsp_formatting(token, typ, entry, time):
 
 
 def connect_server(client, server, port, needed=None):
+    '''Connect to server'''
     if needed:
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
@@ -67,6 +69,7 @@ def connect_server(client, server, port, needed=None):
 
 
 def token_retrieve(user, pw, server, port):
+    '''token retrieve'''
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     if connect_server(client, server, port):
         join_msg = f'{{"join": {{"username": "{user}", "password": "{pw}", "token": ""}}}}'
@@ -80,5 +83,3 @@ def token_retrieve(user, pw, server, port):
         return data.token
     client.close()
     return False
-
-#print(token_retrieve("codewars12", "hi", "168.235.86.101", 3021))

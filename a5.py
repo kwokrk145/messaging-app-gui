@@ -540,8 +540,6 @@ class MainApp(tk.Frame):
         instructions = tk.Menu(menu_bar)
         menu_bar.add_cascade(menu=settings_file, label='Settings')
         menu_bar.add_cascade(menu=instructions, label="Messenger Info")
-        settings_file.add_command(label='Add Contact', font=f,
-                                  command=self.add_contact)
         settings_file.add_command(label='Configure DS Server', font=f,
                                   command=self.configure_server)
         instructions.add_command(label="How to use", font=f,

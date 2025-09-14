@@ -1,3 +1,62 @@
 Software for running chat message. You can talk to other people through dsu server as well as send messages to yourself. 
 This software allows for anyone to participate in. You must create a profile and enter a server. One will be suggested if you cannot. 
-Follow the instructions on the top and everything will be set. Make sure to read importnat information. There is error handling in case you do not follow the instructions. That is, you cannot send a message without connecting to a server or can you send a message without selecting someone to talk with. You must also load or create a new profile in order to view or start storing messages you have sent. Otherwise, you will not be able to use this software. 
+Follow the instructions on the top and everything will be set. Make sure to read importnat information. There is error handling in case you do not follow the instructions. That is, you cannot send a message without connecting to a server or can you send a message without selecting someone to talk with. You must also load or create a new profile in order to view or start storing messages you have sent. Otherwise, you will not be able to use this software. # DSU Messenger
+
+## Overview
+
+DSU Messenger is a distributed social messaging application built with Python and Tkinter, enabling real-time direct messaging over a custom DSU server protocol. The project demonstrates robust client-server communication, modular design, and a user-friendly GUI, suitable for both personal and collaborative messaging.
+
+## Features
+
+- **Profile Management**: Create, load, and persist user profiles with secure credential storage and message history ([Profile.py](Profile.py)).
+- **Direct Messaging**: Send and receive direct messages using a custom protocol ([ds_messenger.py](ds_messenger.py), [ds_protocol.py](ds_protocol.py)).
+- **Contact Management**: Add, select, and manage contacts with dynamic UI updates ([a5.py](a5.py)).
+- **Server Communication**: Reliable socket-based communication with error handling and token-based authentication ([server_commands.py](server_commands.py)).
+- **GUI/UX**: Responsive Tkinter interface with real-time updates, scrollable message history, and intuitive dialogs ([a5.py](a5.py), [treeview.py](treeview.py)).
+- **Unit Testing**: Comprehensive test coverage for protocol and messenger logic ([test_ds_message_protocol.py](test_ds_message_protocol.py), [test_ds_messenger.py](test_ds_messenger.py)).
+
+## Architecture
+
+- **MVC Pattern**: Separation of concerns between data (Profile, Post), business logic (DirectMessenger), and presentation (Tkinter GUI).
+- **Extensible Protocol Layer**: Easily adaptable for new message types or server endpoints.
+- **Error Handling**: Graceful handling of network, authentication, and user input errors.
+- **Persistence**: Profiles and messages are serialized to disk in JSON format for reliability and portability.
+
+## Technologies
+
+- **Python 3.11+**
+- **Tkinter** for GUI
+- **Socket** for networking
+- **JSON** for serialization
+- **Unittest** for automated testing
+
+## Getting Started
+
+1. **Install Python 3.11+**
+2. **Clone the repository**
+3. **Run the application**
+   ```sh
+   python a5.py
+   ```
+4. **Create or open a profile** via the GUI
+5. **Connect to a DSU server** (default: `168.235.86.101`)
+6. **Start messaging!**
+
+## Code Quality
+
+- **PEP8 compliant**
+- **Type hints** for clarity and maintainability
+- **Modular structure** for easy extension and testing
+- **Docstrings** and inline comments for documentation
+
+## Example Screenshots
+
+*(Add screenshots of the GUI here)*
+
+## Testing
+
+Run all unit tests:
+```sh
+python -m unittest discover
+```
+

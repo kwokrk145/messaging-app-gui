@@ -18,8 +18,6 @@ import json
 import socket
 from collections import namedtuple
 
-server = "168.235.86.101"
-port = 3021
 # Namedtuple to hold the values retrieved from json messages.
 DataTuple = namedtuple('DataTuple', ['typ', 'msg', 'token'])
 DataT = namedtuple("DataT", ["typ", "msg"])
@@ -72,7 +70,8 @@ def token_retrieve(user, pw, server, port):
     '''token retrieve'''
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     if connect_server(client, server, port):
-        join_msg = f'{{"join": {{"username": "{user}", "password": "{pw}", "token": ""}}}}'
+        join_msg = f'{{"join": {{"username": "{user}",\
+                     "password": "{pw}", "token": ""}}}}'
         g_send = client.makefile('w')
         recv = client.makefile('r')
         g_send.write(join_msg + '\r\n')
@@ -83,6 +82,7 @@ def token_retrieve(user, pw, server, port):
         return data.token
     client.close()
     return False
+
 
 def response(msg, server, port):
     '''Send information to server'''

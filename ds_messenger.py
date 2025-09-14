@@ -31,7 +31,8 @@ class DirectMessenger:
                 to_send = f'{{"token": "{self.token}", "directmessage":\
                             {{"entry": "{message}", "recipient":\
                               "{recipient}", "timestamp": "{time.time()}"}}}}'
-                resp = server_commands.response(to_send, self.server, self.port)
+                resp = server_commands.response(to_send, self.server,
+                                                self.port)
                 info = ds_protocol.directmessage(resp, "direct")
                 if info is None:
                     condition = False
@@ -50,7 +51,8 @@ class DirectMessenger:
             if condition:
                 self.token = condition
                 to_send = f'{{"token":"{self.token}", "directmessage": "new"}}'
-                resp = server_commands.response(to_send, self.server, self.port)
+                resp = server_commands.response(to_send, self.server,
+                                                self.port)
                 info = ds_protocol.directmessage(resp, "other").msg
                 for m in info:
                     m = DirectMessage(m["from"], m["message"], m["timestamp"])
@@ -70,7 +72,8 @@ class DirectMessenger:
             if condition:
                 self.token = condition
                 to_send = f'{{"token":"{self.token}", "directmessage": "all"}}'
-                resp = server_commands.response(to_send, self.server, self.port)
+                resp = server_commands.response(to_send, self.server,
+                                                self.port)
                 info = ds_protocol.directmessage(resp, "other").msg
                 for m in info:
                     m = DirectMessage(m["from"], m["message"], m["timestamp"])

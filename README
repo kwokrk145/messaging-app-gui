@@ -1,3 +1,3 @@
 Software for running chat message. You can talk to other people through dsu server as well as send messages to yourself. 
 This software allows for anyone to participate in. You must create a profile and enter a server. One will be suggested if you cannot. 
-Follow the instructions on the top and everything will be set. Make sure to read importnat information. 
+Follow the instructions on the top and everything will be set. Make sure to read importnat information. There is error handling in case you do not follow the instructions. That is, you cannot send a message without connecting to a server or can you send a message without selecting someone to talk with. You must also load or create a new profile in order to view or start storing messages you have sent. Otherwise, you will not be able to use this software. 

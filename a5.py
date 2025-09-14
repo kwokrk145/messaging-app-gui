@@ -438,6 +438,7 @@ class MainApp(tk.Frame):
             self.username = ud.user
             self.password = ud.pwd
             self.bio = ud.bio
+            self.server = None
             profile = Profile.Profile()
             profile.username = self.username
             profile.password = self.password
